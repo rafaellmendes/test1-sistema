@@ -1,70 +1,100 @@
-# This workflow will upload a Python Package to PyPI when a release is created
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#publishing-to-package-registries
+# ========================
+#  Sistema TO-DO via Prompt
+# ========================
 
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
+todolist = []
 
-name: Upload Python Package
 
-on:
-  release:
-    types: [published]
+def adicionar_tarefa():
+    descricao = input("Digite a descrição da tarefa: ")
+    tarefa = {
+        "descricao": descricao,
+        "status": "pendente"
+    }
+    todolist.append(tarefa)
+    print("✔ Tarefa adicionada com sucesso!\n")
 
-permissions:
-  contents: read
 
-jobs:
-  release-build:
-    runs-on: ubuntu-latest
+def listar_tarefas():
+    if not todolist:
+        print("Nenhuma tarefa cadastrada.\n")
+        return
 
-    steps:
-      - uses: actions/checkout@v4
+    print("\n===== LISTA DE TAREFAS =====")
+    for i, tarefa in enumerate(todolist):
+        print(f"{i+1}. {tarefa['descricao']} - {tarefa['status']}")
+    print()
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
 
-      - name: Build release distributions
-        run: |
-          # NOTE: put your own distribution build steps here.
-          python -m pip install build
-          python -m build
+def concluir_tarefa():
+    listar_tarefas()
+    if not todolist:
+        return
 
-      - name: Upload distributions
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-dists
-          path: dist/
+    try:
+        indice = int(input("Número da tarefa para concluir: ")) - 1
+        todolist[indice]["status"] = "concluída"
+        print("✔ Tarefa marcada como concluída!\n")
+    except:
+        print("⚠ Número inválido!\n")
 
-  pypi-publish:
-    runs-on: ubuntu-latest
-    needs:
-      - release-build
-    permissions:
-      # IMPORTANT: this permission is mandatory for trusted publishing
-      id-token: write
 
-    # Dedicated environments with protections for publishing are strongly recommended.
-    # For more information, see: https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#deployment-protection-rules
-    environment:
-      name: pypi
-      # OPTIONAL: uncomment and update to include your PyPI project URL in the deployment status:
-      # url: https://pypi.org/p/YOURPROJECT
-      #
-      # ALTERNATIVE: if your GitHub Release name is the PyPI project version string
-      # ALTERNATIVE: exactly, uncomment the following line instead:
-      # url: https://pypi.org/project/YOURPROJECT/${{ github.event.release.name }}
+def editar_tarefa():
+    listar_tarefas()
+    if not todolist:
+        return
 
-    steps:
-      - name: Retrieve release distributions
-        uses: actions/download-artifact@v4
-        with:
-          name: release-dists
-          path: dist/
+    try:
+        indice = int(input("Número da tarefa para editar: ")) - 1
+        nova_desc = input("Nova descrição: ")
+        todolist[indice]["descricao"] = nova_desc
+        print("✔ Tarefa editada com sucesso!\n")
+    except:
+        print("⚠ Número inválido!\n")
 
-      - name: Publish release distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: dist/
+
+def remover_tarefa():
+    listar_tarefas()
+    if not todolist:
+        return
+
+    try:
+        indice = int(input("Número da tarefa para remover: ")) - 1
+        todolist.pop(indice)
+        print("✔ Tarefa removida!\n")
+    except:
+        print("⚠ Número inválido!\n")
+
+
+def menu():
+    while True:
+        print("===== MENU TO-DO =====")
+        print("1. Adicionar tarefa")
+        print("2. Listar tarefas")
+        print("3. Marcar como concluída")
+        print("4. Editar tarefa")
+        print("5. Remover tarefa")
+        print("6. Sair")
+        print("======================")
+
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == "1":
+            adicionar_tarefa()
+        elif opcao == "2":
+            listar_tarefas()
+        elif opcao == "3":
+            concluir_tarefa()
+        elif opcao == "4":
+            editar_tarefa()
+        elif opcao == "5":
+            remover_tarefa()
+        elif opcao == "6":
+            print("Saindo do sistema... Até mais!")
+            break
+        else:
+            print("⚠ Opção inválida! Tente novamente.\n")
+
+
+# Iniciar sistema
+menu()
